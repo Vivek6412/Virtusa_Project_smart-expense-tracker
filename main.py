@@ -1,185 +1,182 @@
-import matplotlib.pyplot as plt
-import json
+import csv
+import os
 from datetime import datetime
+import matplotlib.pyplot as plt
 
-FILE = "expenses.json"
+FILE_NAME = "expenses.csv"
 
-# -------- ADD EXPENSE --------
+
+# ---------- CREATE CSV FILE ----------
+def initialize_file():
+    if not os.path.exists(FILE_NAME):
+        with open(FILE_NAME, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Amount", "Category", "Description", "Date"])
+
+
+# ---------- ADD EXPENSE ----------
 def add_expense():
-    amount = float(input("Enter amount: "))
-    category = input("Enter category: ")
-    description = input("Enter description: ")
-    date = datetime.now().strftime("%Y-%m-%d")
-
-    expense = {
-        "amount": amount,
-        "category": category,
-        "description": description,
-        "date": date
-    }
-
     try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
-    except:
-        data = []
+        amount = float(input("Enter amount: ₹"))
+        category = input("Enter category: ").strip()
+        description = input("Enter description: ").strip()
+        date = datetime.now().strftime("%Y-%m-%d")
 
-    data.append(expense)
+        with open(FILE_NAME, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([amount, category, description, date])
 
-    with open(FILE, "w") as f:
-        json.dump(data, f, indent=4)
+        print("\nExpense added successfully!")
 
-    print("Expense added!")
+    except ValueError:
+        print("Invalid amount entered.")
 
-# -------- VIEW EXPENSE --------
+
+# ---------- VIEW EXPENSES ----------
 def view_expenses():
     try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
+        with open(FILE_NAME, mode='r') as file:
+            reader = csv.reader(file)
+            rows = list(reader)
 
-        for exp in data:
-            print(exp)
-    except:
-        print("No data")
+            if len(rows) <= 1:
+                print("No expenses found.")
+                return
 
+            print("\n===== ALL EXPENSES =====\n")
+
+            for row in rows[1:]:
+                print(
+                    f"Date: {row[3]} | "
+                    f"Amount: ₹{row[0]} | "
+                    f"Category: {row[1]} | "
+                    f"Description: {row[2]}"
+                )
+
+    except FileNotFoundError:
+        print("Expense file not found.")
+
+
+# ---------- MONTHLY SUMMARY ----------
 def monthly_summary():
     month = input("Enter month (YYYY-MM): ")
 
+    total = 0
+
     try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
+        with open(FILE_NAME, mode='r') as file:
+            reader = csv.DictReader(file)
 
-        total = 0
-        for item in data:
-            if item["date"].startswith(month):
-                total += item["amount"]
+            for row in reader:
+                if row["Date"].startswith(month):
+                    total += float(row["Amount"])
 
-        print(f"Total expense for {month}: ₹{total}")
+        print(f"\nTotal expense for {month}: ₹{total}")
+
     except:
-        print("No data found.")
+        print("Error reading file.")
 
+
+# ---------- CATEGORY BREAKDOWN ----------
 def category_breakdown():
+    category_totals = {}
+
     try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
+        with open(FILE_NAME, mode='r') as file:
+            reader = csv.DictReader(file)
 
-        category_totals = {}
+            for row in reader:
+                category = row["Category"]
+                amount = float(row["Amount"])
 
-        for item in data:
-            cat = item["category"]
-            category_totals[cat] = category_totals.get(cat, 0) + item["amount"]
+                if category in category_totals:
+                    category_totals[category] += amount
+                else:
+                    category_totals[category] = amount
 
-        print("\nCategory-wise spending:")
-        for cat, amt in category_totals.items():
-            print(f"{cat}: ₹{amt}")
+        if not category_totals:
+            print("No expense data found.")
+            return None
+
+        print("\n===== CATEGORY BREAKDOWN =====")
+
+        for category, total in category_totals.items():
+            print(f"{category}: ₹{total}")
 
         return category_totals
-    except:
-        print("No data found.")
-        return {}
 
-def highest_category():
+    except:
+        print("Error reading data.")
+        return None
+
+
+# ---------- HIGHEST SPENDING CATEGORY ----------
+def highest_spending_category():
     data = category_breakdown()
-    if not data:
-        return
 
-    max_cat = max(data, key=data.get)
-    print(f"Highest spending category: {max_cat}")
+    if data:
+        highest = max(data, key=data.get)
+        print(f"\nHighest spending category: {highest}")
 
-def monthly_summary():
-    month = input("Enter month (YYYY-MM): ")
 
-    try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
-
-        total = 0
-        for item in data:
-            if item["date"].startswith(month):
-                total += item["amount"]
-
-        print(f"Total expense for {month}: ₹{total}")
-    except:
-        print("No data found.")
-
-def category_breakdown():
-    try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
-
-        category_totals = {}
-
-        for item in data:
-            cat = item["category"]
-            category_totals[cat] = category_totals.get(cat, 0) + item["amount"]
-
-        print("\nCategory-wise spending:")
-        for cat, amt in category_totals.items():
-            print(f"{cat}: ₹{amt}")
-
-        return category_totals
-    except:
-        print("No data found.")
-        return {}
-
-def highest_category():
-    data = category_breakdown()
-    if not data:
-        return
-
-    max_cat = max(data, key=data.get)
-    print(f"Highest spending category: {max_cat}")
-
+# ---------- PIE CHART ----------
 def show_pie_chart():
-    try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
+    data = category_breakdown()
 
-        category_totals = {}
+    if data:
+        labels = data.keys()
+        values = data.values()
 
-        for item in data:
-            cat = item["category"]
-            category_totals[cat] = category_totals.get(cat, 0) + item["amount"]
-
-        labels = category_totals.keys()
-        values = category_totals.values()
-
+        plt.figure(figsize=(7, 7))
         plt.pie(values, labels=labels, autopct='%1.1f%%')
         plt.title("Expense Distribution")
         plt.show()
 
-    except:
-        print("No data to show")
 
-# -------- MAIN MENU --------
+# ---------- MAIN MENU ----------
 def main():
+
+    initialize_file()
+
     while True:
-        print("\n1. Add Expense")
+
+        print("\n====== SMART EXPENSE TRACKER ======")
+        print("1. Add Expense")
         print("2. View Expenses")
         print("3. Monthly Summary")
         print("4. Category Breakdown")
-        print("5. Highest Category")
+        print("5. Highest Spending Category")
         print("6. Show Pie Chart")
         print("7. Exit")
 
-        choice = input("Enter choice: ")
+        choice = input("\nEnter your choice: ")
 
         if choice == "1":
             add_expense()
+
         elif choice == "2":
             view_expenses()
+
         elif choice == "3":
             monthly_summary()
+
         elif choice == "4":
             category_breakdown()
+
         elif choice == "5":
-            highest_category()
+            highest_spending_category()
+
         elif choice == "6":
             show_pie_chart()
+
         elif choice == "7":
+            print("Exiting application...")
             break
 
+        else:
+            print("Invalid choice. Please try again.")
 
-# -------- RUN --------
+
+# ---------- RUN PROGRAM ----------
 if __name__ == "__main__":
     main()

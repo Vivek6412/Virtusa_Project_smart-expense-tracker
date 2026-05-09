@@ -1,75 +1,85 @@
-# 💰 Smart Expense Tracker
+# 💰 Smart Expense Tracker (CLI-Based)
 
 ## 📌 Project Overview
 
-This project is a Smart Expense Tracker built using Python to help users manage and analyze their daily expenses. It provides both a **CLI version** and a **GUI version using Tkinter**, making it easy to use while also visualizing spending patterns.
+Smart Expense Tracker is a Python-based Command Line Interface (CLI) application developed to help users manage and track their daily expenses efficiently. The project stores expense records in a CSV file and provides basic expense analysis features such as monthly summaries, category-wise spending analysis, highest spending category detection, and graphical visualization using pie charts.
 
 ---
 
 ## 🚀 Features
 
-* Add and store daily expenses
-* Categorize spending (Food, Travel, Bills, etc.)
-* Generate monthly expense summaries
-* Identify highest spending category
-* Visualize data using pie charts
-* Simple GUI built using Tkinter
+- Add daily expenses
+- View all saved expenses
+- Store data using CSV files
+- Generate monthly expense summaries
+- Category-wise expense breakdown
+- Detect highest spending category
+- Expense visualization using pie charts
+- Simple CLI-based interaction
 
 ---
 
 ## 🛠️ Technologies Used
 
-* Python
-* Tkinter (GUI development)
-* JSON (data storage)
-* Matplotlib (data visualization)
+- Python
+- CSV File Handling
+- Matplotlib
 
 ---
 
 ## 📸 Screenshots
 
-### 🖥️ GUI
-
-![GUI](gui.png)
-
-### 📊 Expense Distribution (Pie Chart)
-
-![Chart](chart.png)
-
-### 💻 CLI Output
+### 💻 CLI Menu
 
 ![CLI](cli.png)
 
+### 📊 Expense Distribution Pie Chart
+
+![Chart](chart.png)
+
 ---
 
-## ▶️ How to Run
+## ▶️ How to Run the Project
 
-### 🔹 CLI Version
+### 1️⃣ Install Required Library
+
+```bash
+pip install matplotlib
+```
+
+### 2️⃣ Run the Application
 
 ```bash
 python main.py
 ```
 
-### 🔹 GUI Version
+---
 
-```bash
-python gui.py
+## 📂 Project Structure
+
+```text
+Smart-Expense-Tracker/
+│
+├── main.py
+├── expenses.csv
+├── requirements.txt
+├── README.md
+├── cli.png
+└── chart.png
 ```
 
 ---
 
-## 📊 Functionality
+## 📊 Functionalities
 
-The application allows users to record expenses, organize them into categories, and analyze spending trends. It provides a clear view of where money is being spent through summaries and visual charts.
+The application allows users to:
 
----
-
-## 📌 Future Improvements
-
-* Export data to Excel/CSV
-* Add database integration
-* Build a web-based version using Flask
-* Add user authentication
+- Record and save expenses
+- Categorize expenses such as Food, Travel, Bills, etc.
+- View complete expense history
+- Analyze monthly spending
+- Identify highest spending categories
+- Visualize spending distribution using pie charts
 
 ---
 
